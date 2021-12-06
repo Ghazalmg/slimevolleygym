@@ -35,7 +35,7 @@ def eval_policy(policy1,policy2, env='SlimeVolley-v0', num_test_episodes=10, ren
         test_rewards1.append(episode_total_reward1)
         test_rewards2.append(episode_total_reward2)
     test_env.close()
-    return sum(test_rewards1),sum(test_rewards2)
+    return sum(test_rewards1)/num_test_episodes,sum(test_rewards2)/num_test_episodes
 
 
 if __name__ == "__main__":

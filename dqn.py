@@ -68,6 +68,8 @@ def optimize_model(state, action1, action2, next_state, reward, done):
     loss2 = criterion(torch.argmax(model2.forward(state)),y2)    
     optimizer.zero_grad()
     loss1.backward()
+    optimizer.step()
+    optimizer.zero_grad()
     loss2.backward()
     optimizer.step()
     
@@ -92,12 +94,12 @@ def train_reinforcement_learning(render=False):
             state = next_state
 
             if render:
-                env.render(mode='human')
+                env.render()
 
             if done:
                 if i_episode % PRINT_INTERVAL == 0:
                     print('[Episode {:4d}/{}] [Steps {:4d}] [reward {:.1f}]'
-                        .format(i_episode, NUM_EPISODES, t, episode_total_reward))
+                        .format(i_episode, NUM_EPISODES, t, episode_total_reward1,episode_total_reward2))
                 break
 
         if i_episode % TARGET_UPDATE == 0:
@@ -106,18 +108,18 @@ def train_reinforcement_learning(render=False):
 
         if i_episode % TEST_INTERVAL == 0:
             print('-'*10)
-            score1,score2 = eval_policy(policy=model, env=ENV_NAME, render=render)
+            score1,score2 = eval_policy(policy1=model,policy2=model2, env=ENV_NAME, render=render)
             if score1 > best_score1:
                 best_score1 = score1
                 torch.save(model.state_dict(), "best_model_{}.pt".format(ENV_NAME))
                 print('saving model.')
-            print("[TEST Episode {}] [Average Reward {}]".format(i_episode, score))
+            print("[TEST Episode {}] [Average Reward {}]".format(i_episode, score1))
             print('-'*10)
         if score2 > best_score2:
                 best_score2 = score2
                 torch.save(model2.state_dict(), "best_model_{}.pt".format(ENV_NAME))
                 print('saving model.')
-                print("[TEST Episode {}] [Average Reward {}]".format(i_episode, score))
+                print("[TEST Episode {}] [Average Reward {}]".format(i_episode, score2))
                 print('-'*10)    
 
 
