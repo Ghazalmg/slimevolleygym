@@ -45,13 +45,13 @@ def choose_action(state, test_mode=False):
     if r<EPS_EXPLORATION:
         action1 = torch.tensor(env.action_space.sample())
     else:
-        action1 = binary(torch.argmax(model.forward(torch.tensor(state))),3)
+        action1 = binary(torch.argmax(model.forward(torch.tensor(state).float())),3)
     
     r = np.random.random()
     if r<EPS_EXPLORATION:
         action2 = torch.tensor(env.action_space.sample())
     else:
-        action2 = binary(torch.argmax(model2.forward(torch.tensor(state))),3)
+        action2 = binary(torch.argmax(model2.forward(torch.tensor(state).float())),3)
     return action1,action2
    
 
@@ -61,11 +61,11 @@ def optimize_model(state, action1, action2, next_state, reward, done):
             y1 =torch.tensor(reward)
             y2 =torch.tensor(-reward)
         else:
-            y1 = reward + GAMMA * torch.max(target(torch.tensor(next_state)))
-            y2 = -reward + GAMMA * torch.max(target(torch.tensor(next_state)))
+            y1 = reward + GAMMA * torch.max(target(torch.tensor(state).float()))
+            y2 = -reward + GAMMA * torch.max(target(torch.tensor(state).float()))
     criterion = nn.MSELoss()
-    loss1 = criterion(torch.argmax(model.forward(torch.tensor(state))),y1)    
-    loss2 = criterion(torch.argmax(model2.forward(torch.tensor(state))),y2)    
+    loss1 = criterion(torch.argmax(model.forward(torch.tensor(state).float())),y1)    
+    loss2 = criterion(torch.argmax(model2.forward(torch.tensor(state).float())),y2)    
     optimizer.zero_grad()
     loss1.backward()
     optimizer.step()
