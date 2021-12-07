@@ -102,7 +102,7 @@ def train_reinforcement_learning(render=False):
 
             if done:
                 if i_episode % PRINT_INTERVAL == 0:
-                    print('[Episode {:4d}/{}] [Steps {:4d}] [reward {:.1f}]'
+                    print('[Episode {:4d}/{}] [Steps {:4d}] [reward1 {:.1f}][reward2 {:.1f}]'
                         .format(i_episode, NUM_EPISODES, t, episode_total_reward1,episode_total_reward2))
                 break
 
@@ -123,8 +123,8 @@ def train_reinforcement_learning(render=False):
                 best_score2 = score2
                 torch.save(model2.state_dict(), "best_model_{}.pt".format(ENV_NAME))
                 print('saving model.')
-                print("[TEST Episode {}] [Average Reward {}]".format(i_episode, score2))
-                print('-'*10)    
+            print("[TEST Episode {}] [Average Reward {}]".format(i_episode, score2))
+            print('-'*10)    
 
 
 train_reinforcement_learning()

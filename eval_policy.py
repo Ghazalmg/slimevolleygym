@@ -17,8 +17,8 @@ def eval_policy(policy1,policy2, env='SlimeVolley-v0', num_test_episodes=10, ren
         episode_total_reward2 = 0
         while True:
             state = torch.tensor([state], device=device, dtype=torch.float32)
-            action1 = binary(policy1.select_action(state).cpu().numpy()[0][0])
-            action2 = binary(policy2.select_action(state).cpu().numpy()[0][0])
+            action1 = binary(policy1.select_action(state).cpu().numpy()[0][0],3)
+            action2 = binary(policy2.select_action(state).cpu().numpy()[0][0],3)
             next_state, reward, done, _ = test_env.step(action1,action2)
             
             if render:
@@ -29,7 +29,7 @@ def eval_policy(policy1,policy2, env='SlimeVolley-v0', num_test_episodes=10, ren
             state = next_state
             if done:
                 if verbose:
-                    print('[Episode {:4d}/{}] [reward {:.1f}]'
+                    print('[Episode {:4d}/{}] [reward {:.1f}][reward2 {:.1f}]'
                         .format(i, num_test_episodes, episode_total_reward1,episode_total_reward2))
                 break
         test_rewards1.append(episode_total_reward1)
