@@ -8,6 +8,10 @@ from model import MyModel
 #from replay_buffer import ReplayBuffer
 import slimevolleygym
 import numpy as np
+import torch.nn as nn
+import torch.nn.functional as F
+import slimevolleygym
+
 
 BATCH_SIZE = 256
 GAMMA = 0.99
