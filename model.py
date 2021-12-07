@@ -20,4 +20,4 @@ class MyModel(nn.Module):
         self.eval()
         x = self.forward(state)
         self.train()
-        return x.max(1)[1].view(1, 1).to(torch.long)
+        return x.max(1)[1]

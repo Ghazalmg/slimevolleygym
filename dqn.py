@@ -28,10 +28,10 @@ env = gym.make(ENV_NAME)
 state_shape = len(env.reset())
 n_actions = 2**env.action_space.n
 
-model = MyModel(state_shape, n_actions).to(device)
-target = MyModel(state_shape, n_actions).to(device)
-target.load_state_dict(model.state_dict())
-target.eval()
+model1 = MyModel(state_shape, n_actions).to(device)
+target1 = MyModel(state_shape, n_actions).to(device)
+target1.load_state_dict(model.state_dict())
+target1.eval()
 
 model2 = MyModel(state_shape, n_actions).to(device)
 target2 = MyModel(state_shape, n_actions).to(device)
@@ -50,7 +50,7 @@ def choose_action(state, test_mode=False):
     if r<EPS_EXPLORATION:
         action1 = torch.tensor(env.action_space.sample())
     else:
-        action1 = binary(torch.argmax(model.forward(torch.tensor(state).float())),3)
+        action1 = binary(torch.argmax(model1.forward(torch.tensor(state).float())),3)
     
     r = np.random.random()
     if r<EPS_EXPLORATION:
@@ -65,7 +65,7 @@ def optimize_model(state, action1,action2, next_state, reward, done):
     optimizer.zero_grad()
     with torch.no_grad():
         y1 = reward + (1-done)*GAMMA*torch.max(target(next_state))
-    model1_return = model(state).squeeze()[action1.long()].squeeze()
+    model1_return = model1(state).squeeze()[action1.long()].squeeze()
     loss = loss_function(model1_return, y1)
     loss.backward()
     optimizer.step()
@@ -107,12 +107,12 @@ def train_reinforcement_learning(render=False):
                 break
 
         if i_episode % TARGET_UPDATE == 0:
-            target.load_state_dict(model.state_dict())
+            target.load_state_dict(model1.state_dict())
             target2.load_state_dict(model2.state_dict())
 
         if i_episode % TEST_INTERVAL == 0:
             print('-'*10)
-            score1,score2 = eval_policy(policy1=model,policy2=model2, env=ENV_NAME, render=render)
+            score1,score2 = eval_policy(policy1=model1,policy2=model2, env=ENV_NAME, render=render)
             if score1 > best_score1:
                 best_score1 = score1
                 torch.save(model.state_dict(), "best_model_{}.pt".format(ENV_NAME))
