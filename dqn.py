@@ -39,6 +39,7 @@ target2.load_state_dict(model.state_dict())
 target2.eval()
 
 optimizer = torch.optim.SGD(model.parameters(), lr=LEARNING_RATE)
+loss_function = nn.MSELoss()
 # memory = ReplayBuffer()
 def binary(x, bits):
     mask = 2 ** torch.arange(bits - 1, -1, -1).to(x.device, x.dtype)
@@ -58,23 +59,22 @@ def choose_action(state, test_mode=False):
         action2 = binary(torch.argmax(model2.forward(torch.tensor(state).float())),3)
     return action1,action2
    
-
-def optimize_model(state, action1, action2, next_state, reward, done):
-    with torch.no_grad():
-        if done:
-            y1 =torch.tensor(reward)
-            y2 =torch.tensor(-reward)
-        else:
-            y1 = reward + GAMMA * torch.max(target(torch.tensor(state).float()))
-            y2 = -reward + GAMMA * torch.max(target(torch.tensor(state).float()))
-    criterion = nn.MSELoss()
-    loss1 = criterion(torch.argmax(model.forward(torch.tensor(state).float())),y1)    
-    loss2 = criterion(torch.argmax(model2.forward(torch.tensor(state).float())),y2)    
+def optimize_model(state, action1,action2, next_state, reward, done):
+    state=torch.tensor(state).float()
+    next_state=torch.tensor(next_state).float()
     optimizer.zero_grad()
-    loss1.backward()
+    with torch.no_grad():
+        y1 = reward + (1-done)*GAMMA*torch.max(target(next_state))
+    model1_return = model(state).squeeze()[action1.long()].squeeze()
+    loss = loss_function(model1_return, y1)
+    loss.backward()
     optimizer.step()
     optimizer.zero_grad()
-    loss2.backward()
+    with torch.no_grad():
+        y2 = -reward + (1-done)*GAMMA*torch.max(target2(next_state))
+    model2_return = model2(state).squeeze()[action2.long()].squeeze()
+    loss = loss_function(model2_return, y2)
+    loss.backward()
     optimizer.step()
     
 def train_reinforcement_learning(render=False):
@@ -119,7 +119,7 @@ def train_reinforcement_learning(render=False):
                 print('saving model.')
             print("[TEST Episode {}] [Average Reward {}]".format(i_episode, score1))
             print('-'*10)
-        if score2 > best_score2:
+            if score2 > best_score2:
                 best_score2 = score2
                 torch.save(model2.state_dict(), "best_model_{}.pt".format(ENV_NAME))
                 print('saving model.')
