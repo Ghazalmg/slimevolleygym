@@ -12,7 +12,7 @@ def eval_policy(policy1,policy2, env='SlimeVolley-v0', num_test_episodes=10, ren
     test_rewards1 = []
     test_rewards2 = []
     for i in range(num_test_episodes):
-        state = test_env.reset()
+        state = test_env.reset() 
         episode_total_reward1 = 0
         episode_total_reward2 = 0
         while True:
