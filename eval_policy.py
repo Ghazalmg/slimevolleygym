@@ -5,7 +5,7 @@ import slimevolleygym
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 def binary(x, bits):
-    mask = 2 ** torch.arange(bits - 1, -1, -1).to(x.device, x.dtype)
+    mask = 2 ** torch.arange(bits - 1, -1, -1)
     return x.unsqueeze(-1).bitwise_and(mask).ne(0).byte()
 
 def eval_policy(policy1,policy2, env='SlimeVolley-v0', num_test_episodes=10, render=False, verbose=False):

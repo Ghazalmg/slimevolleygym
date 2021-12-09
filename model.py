@@ -20,4 +20,4 @@ class MyModel(nn.Module):
         self.eval()
         x = self.forward(state)
         self.train()
-        return x.max(1)[1]
+        return x.max(0)[1]

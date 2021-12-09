@@ -42,7 +42,7 @@ optimizer = torch.optim.SGD(model.parameters(), lr=LEARNING_RATE)
 loss_function = nn.MSELoss()
 # memory = ReplayBuffer()
 def binary(x, bits):
-    mask = 2 ** torch.arange(bits - 1, -1, -1).to(x.device, x.dtype)
+    mask = 2 ** torch.arange(bits - 1, -1, -1)
     return x.unsqueeze(-1).bitwise_and(mask).ne(0).byte()
 
 def choose_action(state, test_mode=False):
